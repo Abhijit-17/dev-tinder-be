@@ -1,0 +1,15 @@
+{
+  "name": "dev-tinder-be",
+  "version": "1.0.0",
+  "description": "Tinder for developers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app",
+    "dev": "nodemon src/app"
+  },
+  "author": "Abhijit Singh Bhadoria",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
