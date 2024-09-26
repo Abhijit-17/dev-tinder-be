@@ -2,20 +2,23 @@ const express = require("express");
 
 const app = express();
 
-app.get("/user", (req, res) => {
-  res.send({
-    "firstName": "Abhijit",
-    "lastName": "Bhadoria"
-  });
+app.get("/user", (req, res, next) => {
+  console.log("1st response");
+  next();
+  res.send("1st response");
+}, (req, res, next) => {
+  console.log("2nd response");
+  res.send("2nd response")
 });
 
-app.post("/user", (req, res) => {
-  res.send("User saved in DB");
-});
+// app.post("/user/:userId/:fName/:lName", (req, res) => {
+//   console.log(req.params);
+//   res.send("User saved in DB");
+// });
 
-app.delete("/user", (req,res) => {
-  res.send("User deleted from DB");
-});
+// app.delete("/user", (req,res) => {
+//   res.send("User deleted from DB");
+// });
 
 // app.use("/", (req, res) => {
 //   res.send("Namaste Abhijit");
