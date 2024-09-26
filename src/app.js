@@ -2,13 +2,17 @@ const express = require("express");
 
 const app = express();
 
-app.get("/user", (req, res, next) => {
+app.get("/user", [(req, res, next) => {
   console.log("1st response");
   next();
-  res.send("1st response");
+  //res.send("1st response");
 }, (req, res, next) => {
   console.log("2nd response");
-  res.send("2nd response")
+  //res.send("2nd response");
+  next();
+}], (req, res, next) => {
+  console.log("3rd response");
+  res.send("3rd response");
 });
 
 // app.post("/user/:userId/:fName/:lName", (req, res) => {
