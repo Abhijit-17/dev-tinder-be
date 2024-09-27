@@ -1,19 +1,55 @@
 const express = require("express");
+const { adminAuth, userAuth } = require("./middlewares/auth");
 
 const app = express();
 
-app.get("/user", [(req, res, next) => {
-  console.log("1st response");
-  next();
-  //res.send("1st response");
-}, (req, res, next) => {
-  console.log("2nd response");
-  //res.send("2nd response");
-  next();
-}], (req, res, next) => {
-  console.log("3rd response");
-  res.send("3rd response");
+app.use("/admin", adminAuth);
+
+app.get("/admin/getAllData", (req, res, next) => {
+  console.log("getAllData called");
+  res.send("getAllData called");
 });
+
+app.delete("/admin/deleteAllData", (req, res, next) => {
+  console.log("deleteAllData called");
+  res.send("deleteAllData called");
+});
+
+app.get("/user/login", (req, res, next) => {
+  res.send("user logged in");
+});
+
+app.get("/user/getAllData", userAuth, (req, res, next) => {
+  res.send("user data sent");
+});
+
+// app.get("/user", [(req, res, next) => {
+//   console.log("1st response");
+//   next();
+//   //res.send("1st response");
+// }, (req, res, next) => {
+//   console.log("2nd response");
+//   //res.send("2nd response");
+//   next();
+// }], (req, res, next) => {
+//   console.log("3rd response");
+//   res.send("3rd response");
+// });
+
+// app.get("/user", (req,res,next) => {
+//   console.log("1st response");
+//   next();
+// });
+
+// app.get("/user", (req,res,next) => {
+//   console.log("2nd response");
+//   next();
+// });
+
+// app.get("/user", (req,res,next) => {
+//   console.log("3rd response");
+//   res.send("3rd response");
+// });
 
 // app.post("/user/:userId/:fName/:lName", (req, res) => {
 //   console.log(req.params);
