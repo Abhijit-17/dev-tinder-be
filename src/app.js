@@ -3,25 +3,38 @@ const { adminAuth, userAuth } = require("./middlewares/auth");
 
 const app = express();
 
-app.use("/admin", adminAuth);
+// app.use("/admin", adminAuth);
 
-app.get("/admin/getAllData", (req, res, next) => {
-  console.log("getAllData called");
-  res.send("getAllData called");
-});
-
-app.delete("/admin/deleteAllData", (req, res, next) => {
-  console.log("deleteAllData called");
-  res.send("deleteAllData called");
-});
-
-app.get("/user/login", (req, res, next) => {
-  res.send("user logged in");
-});
 
 app.get("/user/getAllData", userAuth, (req, res, next) => {
-  res.send("user data sent");
+  try {
+    throw new Error("something went wrong");
+    res.send("user data sent");
+  } catch (error) {
+    res.status(500).send("Error handled in route handler");
+  }
+  
 });
+
+app.use("/", (err, req, res, next) => {
+  res.status(500).send("Error Occured, connect with the admin");
+});
+
+
+
+// app.get("/admin/getAllData", (req, res, next) => {
+//   console.log("getAllData called");
+//   res.send("getAllData called");
+// });
+
+// app.delete("/admin/deleteAllData", (req, res, next) => {
+//   console.log("deleteAllData called");
+//   res.send("deleteAllData called");
+// });
+
+// app.get("/user/login", (req, res, next) => {
+//   res.send("user logged in");
+// });
 
 // app.get("/user", [(req, res, next) => {
 //   console.log("1st response");
