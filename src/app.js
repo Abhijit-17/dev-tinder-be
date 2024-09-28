@@ -6,14 +6,14 @@ const { User } = require("./models/user");
 
 const app = express();
 
+//enabling express js to use JSON objects in requests
+app.use(express.json());
+
 // POST API for signup
 app.post("/signup", async (req,res) => {
-  const userObj = {
-    firstName : "Rohit",
-    lastName : "Sharma",
-    emailId : "rohit@sharma.com",
-    password : "rohit@123"
-  }
+  const userObj = req.body;
+
+  console.log(userObj);
 
   const user = new User(userObj);
 
