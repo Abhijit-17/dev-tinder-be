@@ -28,9 +28,8 @@ app.post("/signup", async (req,res) => {
 
 //get API to search users by email id
 app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
-
   try {
+    const userEmail = req.body.emailId;
     const users  = await User.find({emailId : userEmail});
     if(users.length === 0) {
       res.status(404).send("User not found");
@@ -54,6 +53,56 @@ app.get("/feed", async (req,res) => {
     res.status(400).send("Something went wrong " + "\n" +error.message)
   }
 })
+
+// Delete user by id - userId === mongo db object id
+app.delete("/user", async (req, res) =>{
+  const userId = req.body.userId;
+  try {
+    const user  = await User.findByIdAndDelete(userId);
+    console.log(user);
+    res.send("User deleted successfuly !");
+  } catch (error) {
+    res.status(400).send("Something went wrong " + "\n" +error.message)
+  }
+});
+
+// Update use by user id  -  userId === mongo db object id
+//Patch method should be used
+app.patch("/user/:userId", async (req,res) => {
+  try {
+    const userId = req.params?.userId;
+    const data = req.body;
+    const ALLOWED_UPDATES = [ "photoUrl", "about", "gender", "age", "skills" ];
+    const isUpdateAllowed = Object.keys(data).every( key => ALLOWED_UPDATES.includes(key));
+    if(!isUpdateAllowed){
+      throw new Error("Update not allowed");
+    }
+    const user  = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+      returnDocument: "after"
+    });
+    if(!user) throw new Error("User Not Found !")
+    res.send("User updated successfully !");
+  } catch (error) {
+    res.status(400).send("Something went wrong " + "\n" +error.message)
+  }
+});
+
+app.patch("/user/:emailId", async (req, res) => {
+  try {
+    const userEmail = req.params?.emailId;
+    const data  = req.body;
+    const user = await User.findOneAndUpdate({emailId: userEmail}, data, {
+      runValidators: true,
+      returnDocument: "after"
+    });
+    res.send("User updated successfully by emailId!");
+  } catch (error) {
+    res.status(400).send("Something went wrong " + "\n" +error.message)
+  }
+});
+
+
 
 
 
