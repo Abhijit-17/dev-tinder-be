@@ -4,6 +4,10 @@ const { connectDB } = require("./config/database");
 
 const { User } = require("./models/user");
 
+const { validateSugnUpData, validateLoginData } = require("./utils/validation");
+
+const bcrypt = require("bcrypt");
+
 const app = express();
 
 //enabling express js to use JSON objects in requests
@@ -11,19 +15,54 @@ app.use(express.json());
 
 // POST API for signup
 app.post("/signup", async (req,res) => {
-  const userObj = req.body;
-
-  console.log(userObj);
-
-  const user = new User(userObj);
-
   try {
+    const {firstName, lastName, emailId, password} = req.body;
+
+    // validate the body
+    validateSugnUpData(req);
+  
+    // encrypt the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: hashedPassword
+    });
     await user.save();
     res.status(201).send("User created successfully");
   } catch (error) {
-    res.status(400).send("Error is user creation: " + error.message);
+    res.status(400).send("Error is user creation: \n" + error.message);
   }
 
+});
+
+//POST API for login
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    // validate the body
+    validateLoginData(req);
+    
+    // find if user exists with the emailId
+    const user = await User.findOne({emailId: emailId});
+    if(!user) {
+      throw new Error("Provided email is not registered");
+    }
+
+    // comparing the password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if(isPasswordValid) {
+      res.send("User Login Sucessful");
+    } else {
+      throw new Error("Incorrect Password");
+    }
+
+  } catch (error) {
+    res.status(400).send("Error is user login: \n" + error.message);
+  }
 });
 
 //get API to search users by email id
