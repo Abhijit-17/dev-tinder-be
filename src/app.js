@@ -1,17 +1,26 @@
 const express = require("express");
 
+const bcrypt = require("bcrypt");
+
+const cookieParser = require("cookie-parser");
+
+const jwt = require("jsonwebtoken");
+
 const { connectDB } = require("./config/database");
 
 const { User } = require("./models/user");
 
 const { validateSugnUpData, validateLoginData } = require("./utils/validation");
 
-const bcrypt = require("bcrypt");
+const JWT_SECRET = "RGV2VGluZGVyIEJ5IEFCIGluIE9DVCAyMDI0"; //DevTinder By AB in OCT 2024
 
 const app = express();
 
 //enabling express js to use JSON objects in requests
 app.use(express.json());
+
+//enabling express js to read cookies from the request
+app.use(cookieParser());
 
 // POST API for signup
 app.post("/signup", async (req,res) => {
@@ -55,6 +64,13 @@ app.post("/login", async (req, res) => {
     // comparing the password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if(isPasswordValid) {
+
+      // create JWT token
+      const token = await jwt.sign({_id: user._id}, JWT_SECRET);
+
+      // set token in cookie and send in response
+      res.cookie("token", token);
+      
       res.send("User Login Sucessful");
     } else {
       throw new Error("Incorrect Password");
@@ -64,6 +80,25 @@ app.post("/login", async (req, res) => {
     res.status(400).send("Error is user login: \n" + error.message);
   }
 });
+
+app.get("/profile", async (req,res) => {
+  try {
+    const { token } = req.cookies;
+    if(!token) throw new Error("Please login");
+    
+    const tokenData = await jwt.verify(token, JWT_SECRET);
+    const { _id } = tokenData;
+    if(!_id) throw new Error("Invalid Token");
+
+    const user = await User.findById(_id);
+    if(!user) throw new Error("Invalid Token");
+
+    res.send(user);
+
+  } catch (error) {
+    res.status(400).send("Error fetching profile: \n" + error.message);
+  }
+})
 
 //get API to search users by email id
 app.get("/user", async (req, res) => {
