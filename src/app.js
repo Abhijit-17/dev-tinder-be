@@ -1,24 +1,16 @@
 const express = require("express");
-
 const bcrypt = require("bcrypt");
-
 const cookieParser = require("cookie-parser");
-
 const jwt = require("jsonwebtoken");
-
 const { connectDB } = require("./config/database");
-
 const { User } = require("./models/user");
-
 const { validateSugnUpData, validateLoginData } = require("./utils/validation");
-
+const { userAuth } = require("./middlewares/auth");
 const JWT_SECRET = "RGV2VGluZGVyIEJ5IEFCIGluIE9DVCAyMDI0"; //DevTinder By AB in OCT 2024
-
 const app = express();
 
 //enabling express js to use JSON objects in requests
 app.use(express.json());
-
 //enabling express js to read cookies from the request
 app.use(cookieParser());
 
@@ -81,24 +73,23 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req,res) => {
+// get API to fetch the profile data of logged in user
+app.get("/profile", userAuth, async (req,res) => {
   try {
-    const { token } = req.cookies;
-    if(!token) throw new Error("Please login");
-    
-    const tokenData = await jwt.verify(token, JWT_SECRET);
-    const { _id } = tokenData;
-    if(!_id) throw new Error("Invalid Token");
-
-    const user = await User.findById(_id);
-    if(!user) throw new Error("Invalid Token");
-
-    res.send(user);
-
+    res.send(req.user);
   } catch (error) {
-    res.status(400).send("Error fetching profile: \n" + error.message);
+    res.status(400).send("Error : \n" + error.message);
   }
-})
+});
+
+// POST API to send a connection request, check if user is logged in and valid 
+app.post("/sendConnectionRequest", userAuth, (req, res) => {
+  try {
+    res.send(req.user.firstName + " has sent a connection request");
+  } catch (error) {
+    res.status(400).send("Error : \n" + error.message);
+  }
+});
 
 //get API to search users by email id
 app.get("/user", async (req, res) => {
