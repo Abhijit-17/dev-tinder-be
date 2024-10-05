@@ -53,19 +53,19 @@ app.post("/login", async (req, res) => {
       throw new Error("Provided email is not registered");
     }
 
-    // comparing the password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // comparing the password using scema helper function
+    const isPasswordValid = await user.validatePassword(password);
     if(isPasswordValid) {
 
-      // create JWT token
-      const token = await jwt.sign({_id: user._id}, JWT_SECRET);
+      // create JWT token using schema helper function
+      const token = await user.getJWT();
 
       // set token in cookie and send in response
-      res.cookie("token", token);
+      res.cookie("token", token, {"expires": new Date(Date.now() + (2 * 3600000))});
       
       res.send("User Login Sucessful");
     } else {
-      throw new Error("Incorrect Password");
+      throw new Error("Incorrect Credentials");
     }
 
   } catch (error) {

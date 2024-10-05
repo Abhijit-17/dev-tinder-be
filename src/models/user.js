@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const JWT_SECRET = "RGV2VGluZGVyIEJ5IEFCIGluIE9DVCAyMDI0"; //DevTinder By AB in OCT 2024
+
 
 const userSchema = mongoose.Schema({
   firstName: {
@@ -64,6 +68,20 @@ const userSchema = mongoose.Schema({
     }
   }
 }, { timestamps: true, optimisticConcurrency: true });
+
+// schema helper method to create a jwt token
+userSchema.methods.getJWT = async function() {
+  const user = this;
+  const token = await jwt.sign({_id: user._id}, JWT_SECRET, {expiresIn: "2h"});
+  return token;
+}
+
+// schema helper method to validate password
+userSchema.methods.validatePassword = async function(userInputPassword) {
+  const user = this;
+  const isPasswordValid = await bcrypt.compare(userInputPassword, user.password);
+  return isPasswordValid;
+}
 
 const User = mongoose.model("User", userSchema);
 
