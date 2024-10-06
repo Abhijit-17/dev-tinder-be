@@ -2,9 +2,9 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { connectDB } = require("./config/database");
 const { User } = require("./models/user");
-const { userAuth } = require("./middlewares/auth");
 const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
+const { connectionRequestRouter } = require("./routes/connectionRequest");
 const app = express();
 
 //enabling express js to use JSON objects in requests
@@ -15,15 +15,8 @@ app.use(cookieParser());
 app.use("/", authRouter);
 // importing the profile router and using it
 app.use("/", profileRouter)
-
-// POST API to send a connection request, check if user is logged in and valid 
-app.post("/sendConnectionRequest", userAuth, (req, res) => {
-  try {
-    res.send(req.user.firstName + " " + req.user.lastName + " has sent a connection request");
-  } catch (error) {
-    res.status(400).send("Error : \n" + error.message);
-  }
-});
+// importing the connection request router and using it
+app.use("/", connectionRequestRouter);
 
 //get API to search users by email id
 app.get("/user", async (req, res) => {
