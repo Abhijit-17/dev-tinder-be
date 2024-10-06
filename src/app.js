@@ -1,77 +1,18 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 const { connectDB } = require("./config/database");
 const { User } = require("./models/user");
-const { validateSugnUpData, validateLoginData } = require("./utils/validation");
 const { userAuth } = require("./middlewares/auth");
-const JWT_SECRET = "RGV2VGluZGVyIEJ5IEFCIGluIE9DVCAyMDI0"; //DevTinder By AB in OCT 2024
+const { authRouter } = require("./routes/auth");
 const app = express();
 
 //enabling express js to use JSON objects in requests
 app.use(express.json());
 //enabling express js to read cookies from the request
 app.use(cookieParser());
+// importing the auth router and using it
+app.use("/", authRouter);
 
-// POST API for signup
-app.post("/signup", async (req,res) => {
-  try {
-    const {firstName, lastName, emailId, password} = req.body;
-
-    // validate the body
-    validateSugnUpData(req);
-  
-    // encrypt the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-  
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password: hashedPassword
-    });
-    await user.save();
-    res.status(201).send("User created successfully");
-  } catch (error) {
-    res.status(400).send("Error is user creation: \n" + error.message);
-  }
-
-});
-
-//POST API for login
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-
-    // validate the body
-    validateLoginData(req);
-    
-    // find if user exists with the emailId
-    const user = await User.findOne({emailId: emailId});
-    if(!user) {
-      throw new Error("Provided email is not registered");
-    }
-
-    // comparing the password using scema helper function
-    const isPasswordValid = await user.validatePassword(password);
-    if(isPasswordValid) {
-
-      // create JWT token using schema helper function
-      const token = await user.getJWT();
-
-      // set token in cookie and send in response
-      res.cookie("token", token, {"expires": new Date(Date.now() + (2 * 3600000))});
-      
-      res.send("User Login Sucessful");
-    } else {
-      throw new Error("Incorrect Credentials");
-    }
-
-  } catch (error) {
-    res.status(400).send("Error is user login: \n" + error.message);
-  }
-});
 
 // get API to fetch the profile data of logged in user
 app.get("/profile", userAuth, async (req,res) => {
@@ -85,7 +26,7 @@ app.get("/profile", userAuth, async (req,res) => {
 // POST API to send a connection request, check if user is logged in and valid 
 app.post("/sendConnectionRequest", userAuth, (req, res) => {
   try {
-    res.send(req.user.firstName + " has sent a connection request");
+    res.send(req.user.firstName + " " + req.user.lastName + " has sent a connection request");
   } catch (error) {
     res.status(400).send("Error : \n" + error.message);
   }
