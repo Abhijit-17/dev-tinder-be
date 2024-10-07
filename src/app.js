@@ -95,9 +95,6 @@ app.patch("/user/:emailId", async (req, res) => {
 });
 
 
-
-
-
 connectDB()
 .then(() => {
   console.log("Connection to devTinder DB establish succcessfuly...")
