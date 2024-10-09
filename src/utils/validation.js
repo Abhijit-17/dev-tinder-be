@@ -27,8 +27,17 @@ const validateEditProfileData = (req) => {
     throw new Error("Invalid Edit Request");
 }
 
+const validateEditProfilePassword = (req) => {
+  const { newPassword } = req.body;
+  if (!newPassword || !validator.isStrongPassword(newPassword))
+    throw new Error("New password is not strong enough");
+}
+
+
+
 module.exports = {
   validateSugnUpData,
   validateLoginData,
-  validateEditProfileData
+  validateEditProfileData,
+  validateEditProfilePassword
 }
