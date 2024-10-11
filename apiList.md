@@ -11,8 +11,11 @@ profileRouter
 - PATCH /profile/password
 
 connectionRequestRouter
-- POST /request/send/interested/:userId
-- POST /request/send/ignored/:userId
+For the intent ("interested", "ignored") we will take the intent in request params, just like toUserId
+- POST /request/send/:status/:toUserId
+    - POST /request/send/interested/:userId
+    - POST /request/send/ignored/:userId
+
 - POST /request/review/accepted/:requestId
 - POST /request/review/rejected/:requestId
 

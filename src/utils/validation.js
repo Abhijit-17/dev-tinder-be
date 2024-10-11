@@ -33,11 +33,22 @@ const validateEditProfilePassword = (req) => {
     throw new Error("New password is not strong enough");
 }
 
+const validateSendRequestData = (req) => {
+  const { status, toUserId } = req.params;
+  const statusAllowedFields = ["ignored", "interested", "accepted", "rejected"];
+  if(!status || !toUserId) {
+    throw new Error("Invalid request - missing request parameters");
+  } else if (! statusAllowedFields.includes(status)) {
+    throw new Error("Invalid request - bad request parameters");
+  }
+}
+
 
 
 module.exports = {
   validateSugnUpData,
   validateLoginData,
   validateEditProfileData,
-  validateEditProfilePassword
+  validateEditProfilePassword,
+  validateSendRequestData
 }

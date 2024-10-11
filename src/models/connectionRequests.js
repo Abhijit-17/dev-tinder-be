@@ -20,7 +20,7 @@ const connectionRequestSchema = mongoose.Schema({
   timestamps: true, optimisticConcurrency: true
 });
 
-const ConnectionRequest = mongoose.Model("ConnectionRequest", connectionRequestSchema);
+const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
 
 module.exports = {
   ConnectionRequest
