@@ -16,6 +16,9 @@ connectionRequestRouter
 - POST /request/review/accepted/:requestId
 - POST /request/review/rejected/:requestId
 
+Status ENUM of a connectionRequest
+ignored, interested, accepted, rejected
+
 userRouter
 - GET /user/connections
 - GET /user/requests/recieved
