@@ -16,8 +16,9 @@ For the intent ("interested", "ignored") we will take the intent in request para
     - POST /request/send/interested/:userId
     - POST /request/send/ignored/:userId
 
-- POST /request/review/accepted/:requestId
-- POST /request/review/rejected/:requestId
+- POST /request/review/:status/:requestId
+    - POST /request/review/accepted/:requestId
+    - POST /request/review/rejected/:requestId
 
 Status ENUM of a connectionRequest
 ignored, interested, accepted, rejected

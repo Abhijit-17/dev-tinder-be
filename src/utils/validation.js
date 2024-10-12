@@ -49,6 +49,18 @@ const validateSendRequestData = (req) => {
     throw new Error(`Bad Request - Invalid user Id - ${toUserId}`);
 }
 
+const validateReviewRequestData = (req) => {
+  const { status, requestId } = req.params;
+  const statusAllowedFields = ["accepted", "rejected"];
+  if(!status || !requestId) {
+    throw new Error("Bad request - missing request parameters");
+  } else if(!statusAllowedFields.includes(status)) {
+    throw new Error(`Bad request - Invalid status - ${status}`);
+  } else if(!validateIfObjectId(requestId)) {
+    throw new Error(`Bad request - Invalid request Id - ${requestId}`);
+  }
+}
+
 
 
 module.exports = {
@@ -57,5 +69,6 @@ module.exports = {
   validateEditProfileData,
   validateEditProfilePassword,
   validateSendRequestData,
-  validateIfObjectId
+  validateIfObjectId,
+  validateReviewRequestData
 }
