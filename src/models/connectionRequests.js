@@ -20,6 +20,14 @@ const connectionRequestSchema = mongoose.Schema({
   timestamps: true, optimisticConcurrency: true
 });
 
+connectionRequestSchema.pre("save", function(next) {
+  const connectionRequest = this;
+  if (connectionRequest.toUserId.equals(connectionRequest.fromUserId))
+    throw new Error("Bad Request - requester and reciever are same");
+
+  next();
+});
+
 const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
 
 module.exports = {

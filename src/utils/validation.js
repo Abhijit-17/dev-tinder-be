@@ -1,4 +1,9 @@
 const validator = require("validator");
+const mongoose = require("mongoose");
+
+const validateIfObjectId = (value) => {
+  return mongoose.isObjectIdOrHexString(value);
+}
 
 const validateSugnUpData = (req) => {
   const {firstName, lastName, emailId, password} = req.body;
@@ -35,12 +40,13 @@ const validateEditProfilePassword = (req) => {
 
 const validateSendRequestData = (req) => {
   const { status, toUserId } = req.params;
-  const statusAllowedFields = ["ignored", "interested", "accepted", "rejected"];
+  const statusAllowedFields = ["ignored", "interested"];
   if(!status || !toUserId) {
-    throw new Error("Invalid request - missing request parameters");
-  } else if (! statusAllowedFields.includes(status)) {
-    throw new Error("Invalid request - bad request parameters");
-  }
+    throw new Error("Bad request - missing request parameters");
+  } else if (!statusAllowedFields.includes(status)) {
+    throw new Error(`Bad request - Invalid status - ${status}`);
+  } else if (!validateIfObjectId(toUserId))
+    throw new Error(`Bad Request - Invalid user Id - ${toUserId}`);
 }
 
 
@@ -50,5 +56,6 @@ module.exports = {
   validateLoginData,
   validateEditProfileData,
   validateEditProfilePassword,
-  validateSendRequestData
+  validateSendRequestData,
+  validateIfObjectId
 }

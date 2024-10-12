@@ -4,6 +4,7 @@ const connectionRequestRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const { validateSendRequestData } = require("../utils/validation");
 const { ConnectionRequest } = require("../models/connectionRequests");
+const { User } = require("../models/user");
 
 // POST API to send a connection request, check if user is logged in and valid 
 connectionRequestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
@@ -11,6 +12,28 @@ connectionRequestRouter.post("/send/:status/:toUserId", userAuth, async (req, re
     validateSendRequestData(req);
     const { toUserId, status } = req.params;
     const fromUserId = req.user._id;
+    
+    // check if "toUserId" exists in our user Collection
+    const toUser = await User.findById(toUserId);
+    if(!toUser)
+      throw new Error("User(request receiver) not found");
+
+    // check id user has already sent a request to this person or that person has already sent a request to user
+    const existingConnectionRequest = await ConnectionRequest.findOne({
+      $or: [
+        {
+          fromUserId,
+          toUserId
+        },
+        {
+          fromUserId: toUserId,
+          toUserId: fromUserId
+        }
+      ] 
+    });
+
+    if(existingConnectionRequest) 
+      throw new Error("Connection already exists");
 
     const connectionRequest = new ConnectionRequest({
       fromUserId,
@@ -19,13 +42,25 @@ connectionRequestRouter.post("/send/:status/:toUserId", userAuth, async (req, re
     });
 
     await connectionRequest.save();
+
+    // creating dynamic response message 
+    let successMessage;
+    if(status === "interested") {
+      successMessage = `${req.user.firstName} ${req.user.lastName} has sent a connection request to ${toUser.firstName} ${toUser.lastName}`
+    } else if (status === "ignored") {
+      successMessage = `${req.user.firstName} ${req.user.lastName} has ignored ${toUser.firstName} ${toUser.lastName}`;
+    }
+
     res.json({
-      "message": "Connection request sent successfully !",
+      "message": successMessage,
       "is_success": true
     });
 
   } catch (error) {
-    res.status(400).send("Error : \n" + error.message);
+    res.status(400).json({
+      "message": error.message,
+      "is_success": false
+    });
   }
 });
 
