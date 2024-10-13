@@ -5,6 +5,7 @@ const { User } = require("./models/user");
 const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
 const { connectionRequestRouter } = require("./routes/connectionRequest");
+const { userRouter } = require("./routes/user")
 const app = express();
 
 //enabling express js to use JSON objects in requests
@@ -17,6 +18,8 @@ app.use("/", authRouter);
 app.use("/", profileRouter)
 // importing the connection request router and using it
 app.use("/", connectionRequestRouter);
+// importing the user request router and using it
+app.use("/", userRouter);
 
 //get API to search users by email id
 app.get("/user", async (req, res) => {

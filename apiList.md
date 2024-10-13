@@ -5,10 +5,14 @@ authRouter
 - POST /login
 - POST /logout
 
+------------------------------------------------------------------------------------------------------
+
 profileRouter
 - GET /profile/view
 - PATCH /profile/edit
 - PATCH /profile/password
+
+------------------------------------------------------------------------------------------------------
 
 connectionRequestRouter
 For the intent ("interested", "ignored") we will take the intent in request params, just like toUserId
@@ -23,9 +27,11 @@ For the intent ("interested", "ignored") we will take the intent in request para
 Status ENUM of a connectionRequest
 ignored, interested, accepted, rejected
 
+------------------------------------------------------------------------------------------------------
+
 userRouter
+- GET /user/requests/received
 - GET /user/connections
-- GET /user/requests/recieved
 - GET /user/feed - Gets you the profiles of other users on the platform
 
 
